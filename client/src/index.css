@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 *,
 *::before,
 *::after {
@@ -7,10 +9,11 @@
 }
 
 :root {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   color-scheme: dark;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 15px;
 }
 
 html,
@@ -20,12 +23,16 @@ body,
 }
 
 body {
-  background: #0b0d1a;
-  color: #e6e9f5;
+  background: #080a16;
+  color: #e8ecff;
   overflow: hidden;
 }
 
 button {
   font-family: inherit;
   cursor: pointer;
+}
+
+input {
+  font-family: inherit;
 }
