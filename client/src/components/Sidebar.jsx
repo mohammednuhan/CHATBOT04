@@ -1,0 +1,65 @@
+export default function Sidebar({ title, preview, connecting, onNewChat }) {
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-brand">
+        <span className="brand-logo">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 8V4H8" />
+            <rect width="16" height="12" x="4" y="8" rx="2" />
+            <path d="M2 14h2" />
+            <path d="M20 14h2" />
+            <path d="M15 13v2" />
+            <path d="M9 13v2" />
+          </svg>
+        </span>
+        <span className="brand-name">Agent</span>
+        <span className="brand-pro">AI</span>
+      </div>
+
+      <button type="button" className="new-chat-btn" onClick={onNewChat}>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+          <path d="M12 5v14" />
+          <path d="M5 12h14" />
+        </svg>
+        New chat
+      </button>
+
+      <div className="sidebar-section">
+        <span className="sidebar-section-label">Recent</span>
+        <div className="conv active">
+          <span className="conv-avatar">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 8V4H8" />
+              <rect width="16" height="12" x="4" y="8" rx="2" />
+              <path d="M2 14h2" />
+              <path d="M20 14h2" />
+              <path d="M15 13v2" />
+              <path d="M9 13v2" />
+            </svg>
+          </span>
+          <div className="conv-body">
+            <div className="conv-title-row">
+              <span className="conv-title">{title}</span>
+              {connecting && <span className="conv-typing-tag">typing…</span>}
+            </div>
+            <span className="conv-preview">{preview}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="sidebar-footer">
+        <span className="profile-avatar">G</span>
+        <div className="profile-body">
+          <span className="profile-name">Guest</span>
+          <span className="profile-status">Signed in locally</span>
+        </div>
+        <div className="tb-icon profile-settings">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+          </svg>
+        </div>
+      </div>
+    </aside>
+  )
+}

@@ -78,6 +78,42 @@ def chat(req: ChatRequest):
     return ChatResponse(reply=answer, session_id=session_id)
 
 
+@app.post("/chat/stream")
+async def chat_stream(req: ChatRequest):
+    session_id, history = get_session(req.session_id)
+    history.append({"role": "user", "content": req.message})
+
+    def event_stream():
+        full = ""
+        try:
+            stream = client.chat.completions.create(
+                model=req.model or MODEL,
+                messages=list(history),
+                stream=True,
+            )
+            for chunk in stream:
+                choices = getattr(chunk, "choices", None)
+                if not choices:
+                    continue
+                delta = getattr(choices[0], "delta", None)
+                content = getattr(delta, "content", None) if delta else None
+                if content:
+                    full += content
+                    yield f"data: {json.dumps({'delta': content})}\n\n"
+        except Exception as exc:
+            yield f"data: {json.dumps({'error': str(exc)})}\n\n"
+            return
+
+        history.append({"role": "assistant", "content": full})
+        yield f"data: {json.dumps({'done': True, 'session_id': session_id})}\n\n"
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
 @app.post("/reset")
 def reset(req: dict):
     session_id = req.get("session_id")
