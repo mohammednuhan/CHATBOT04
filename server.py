@@ -22,7 +22,7 @@ client = OpenAI(
     api_key=api_key,
 )
 
-MODEL = os.environ.get("OPENROUTER_MODEL", "poolside/laguna-s-2.1:free")
+MODEL = os.environ.get("OPENROUTER_MODEL", "openrouter/free:free")
 
 SYSTEM_PROMPT = {
     "role": "system",
