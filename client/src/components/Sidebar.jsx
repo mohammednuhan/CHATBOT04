@@ -1,12 +1,21 @@
+const MEM_INLINE_COLORS = {
+  identity: '#6366f1',
+  preference: '#ec4899',
+  goal: '#f59e0b',
+  project: '#14b8a6',
+  fact: '#0ea5e9',
+}
+
 export default function Sidebar({
   title,
   preview,
   connecting,
-  memoryCount,
+  memories,
   memoriesOpen,
   onToggleMemories,
   onNewChat,
 }) {
+  const inline = memories.slice(0, 3)
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -72,12 +81,14 @@ export default function Sidebar({
         <span className="mem-toggle-body">
           <span className="mem-toggle-title">Memory</span>
           <span className="mem-toggle-sub">
-            {memoryCount > 0
-              ? `${memoryCount} ${memoryCount === 1 ? 'item' : 'items'} saved`
+            {memories.length > 0
+              ? `${memories.length} ${memories.length === 1 ? 'item' : 'items'} saved`
               : 'Nothing saved yet'}
           </span>
         </span>
-        {memoryCount > 0 && <span className="mem-toggle-badge">{memoryCount}</span>}
+        {memories.length > 0 && (
+          <span className="mem-toggle-badge">{memories.length}</span>
+        )}
         <svg
           className="mem-toggle-chevron"
           viewBox="0 0 24 24"
@@ -92,6 +103,23 @@ export default function Sidebar({
           <path d="m9 18 6-6-6-6" />
         </svg>
       </button>
+
+      {inline.length > 0 && (
+        <div className="mem-inline">
+          {inline.map((m) => (
+            <div key={m.id} className="mem-inline-item">
+              <span
+                className="mem-inline-dot"
+                style={{
+                  background:
+                    MEM_INLINE_COLORS[m.category] || MEM_INLINE_COLORS.fact,
+                }}
+              />
+              <span className="mem-inline-text">{m.text}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="sidebar-footer">
         <span className="profile-avatar">G</span>

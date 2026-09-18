@@ -299,7 +299,7 @@ export default function App() {
             title={title}
             preview={preview}
             connecting={connecting}
-            memoryCount={memories.length}
+            memories={memories}
             memoriesOpen={memoriesOpen}
             onToggleMemories={() => setMemoriesOpen((v) => !v)}
             onNewChat={handleNewChat}

@@ -465,6 +465,45 @@
   transform: rotate(180deg);
 }
 
+/* ---------- Inline memory preview (sidebar) ---------- */
+.mem-inline {
+  margin: 8px 2px 0;
+  padding: 8px 12px;
+  border-radius: 13px;
+  background: rgba(240, 243, 250, 0.65);
+  border: 1px solid rgba(120, 130, 170, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mem-inline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  min-width: 0;
+}
+
+.mem-inline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+  flex: none;
+}
+
+.mem-inline-text {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #535c7a;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
 .sidebar-footer {
   display: flex;
   align-items: center;
