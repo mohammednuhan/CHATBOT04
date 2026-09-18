@@ -1,4 +1,12 @@
-export default function Sidebar({ title, preview, connecting, onNewChat }) {
+export default function Sidebar({
+  title,
+  preview,
+  connecting,
+  memoryCount,
+  memoriesOpen,
+  onToggleMemories,
+  onNewChat,
+}) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -46,6 +54,44 @@ export default function Sidebar({ title, preview, connecting, onNewChat }) {
           </div>
         </div>
       </div>
+
+      <button
+        type="button"
+        className={`mem-toggle ${memoriesOpen ? 'active' : ''}`}
+        onClick={onToggleMemories}
+      >
+        <span className="mem-toggle-icon">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9.18 9 5.93 6.54a6 6 0 0 0-.6 7.86L8.5 18l2.14-2.14" />
+            <path d="M6.61 12.36a6 6 0 1 1 4.41-5.84" />
+            <path d="M15.56 7.9a6 6 0 0 1 2.16 2.6" />
+            <path d="M9.4 21a6 6 0 0 0 5.32-1.41" />
+            <path d="M16.78 16.93a6 6 0 0 0 .98-5.77" />
+          </svg>
+        </span>
+        <span className="mem-toggle-body">
+          <span className="mem-toggle-title">Memory</span>
+          <span className="mem-toggle-sub">
+            {memoryCount > 0
+              ? `${memoryCount} ${memoryCount === 1 ? 'item' : 'items'} saved`
+              : 'Nothing saved yet'}
+          </span>
+        </span>
+        {memoryCount > 0 && <span className="mem-toggle-badge">{memoryCount}</span>}
+        <svg
+          className="mem-toggle-chevron"
+          viewBox="0 0 24 24"
+          width="15"
+          height="15"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      </button>
 
       <div className="sidebar-footer">
         <span className="profile-avatar">G</span>

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Background from './components/Background.jsx'
 import Sidebar from './components/Sidebar.jsx'
 import ChatHeader from './components/ChatHeader.jsx'
 import Welcome from './components/Welcome.jsx'
 import MessageList from './components/MessageList.jsx'
 import Composer from './components/Composer.jsx'
+import MemoriesPanel from './components/MemoriesPanel.jsx'
 import './App.css'
 
 let seq = 0
@@ -32,10 +33,37 @@ export default function App() {
   const [error, setError] = useState(null)
   const [preview, setPreview] = useState('Say something to start the conversation')
   const [title, setTitle] = useState('New chat')
+  const [memories, setMemories] = useState([])
+  const [memoriesOpen, setMemoriesOpen] = useState(false)
 
   const scrollRef = useRef(null)
   const streamRef = useRef(null)
   const abortRef = useRef(null)
+
+  const fetchMemories = useCallback(async (sid) => {
+    if (!sid) return
+    try {
+      const res = await fetch(
+        `/api/memories?session_id=${encodeURIComponent(sid)}`
+      )
+      if (res.ok) {
+        const data = await res.json()
+        setMemories(data.memories || [])
+      }
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!sessionId) {
+      setMemories([])
+      return undefined
+    }
+    fetchMemories(sessionId)
+    const timer = setInterval(() => fetchMemories(sessionId), 6000)
+    return () => clearInterval(timer)
+  }, [sessionId, fetchMemories])
 
   useEffect(() => {
     const el = scrollRef.current
@@ -125,6 +153,7 @@ export default function App() {
         }
       }
       setPreview((p) => p.trim() || 'Reply received')
+      fetchMemories(sessionId)
       finish(false)
     } catch (err) {
       if (err.name === 'AbortError') {
@@ -169,6 +198,55 @@ export default function App() {
     setError(null)
     setPreview('Say something to start the conversation')
     setTitle('New chat')
+    setMemories([])
+  }
+
+  async function handleAddMemory(text) {
+    if (!sessionId || !text.trim()) return
+    try {
+      const res = await fetch('/api/memories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, text: text.trim() }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setMemories(data.memories || [])
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  async function handleDeleteMemory(id) {
+    if (!sessionId) return
+    try {
+      const res = await fetch('/api/memories/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, id }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setMemories(data.memories || [])
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  async function handleClearMemories() {
+    if (!sessionId) return
+    try {
+      const res = await fetch('/api/memories/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId }),
+      })
+      if (res.ok) setMemories([])
+    } catch {
+      // ignore
+    }
   }
 
   return (
@@ -186,6 +264,21 @@ export default function App() {
             <span className="titlebar-dot" /> Agent — chat with AI
           </div>
           <div className="titlebar-actions">
+            <button
+              type="button"
+              className={`tb-btn ${memoriesOpen ? 'active' : ''}`}
+              onClick={() => setMemoriesOpen((v) => !v)}
+              title="Memory"
+            >
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9.18 9 5.93 6.54a6 6 0 0 0-.6 7.86L8.5 18l2.14-2.14" />
+                <path d="M6.61 12.36a6 6 0 1 1 4.41-5.84" />
+                <path d="M15.56 7.9a6 6 0 0 1 2.16 2.6" />
+                <path d="M9.4 21a6 6 0 0 0 5.32-1.41" />
+                <path d="M16.78 16.93a6 6 0 0 0 .98-5.77" />
+              </svg>
+              <span className="tb-btn-badge">{memories.length}</span>
+            </button>
             <div className="tb-icon">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <circle cx="11" cy="11" r="7" />
@@ -206,6 +299,9 @@ export default function App() {
             title={title}
             preview={preview}
             connecting={connecting}
+            memoryCount={memories.length}
+            memoriesOpen={memoriesOpen}
+            onToggleMemories={() => setMemoriesOpen((v) => !v)}
             onNewChat={handleNewChat}
           />
 
@@ -234,6 +330,16 @@ export default function App() {
               onSuggestion={handleSend}
             />
           </div>
+
+          <MemoriesPanel
+            open={memoriesOpen}
+            memories={memories}
+            sessionActive={!!sessionId}
+            onClose={() => setMemoriesOpen(false)}
+            onAdd={handleAddMemory}
+            onDelete={handleDeleteMemory}
+            onClear={handleClearMemories}
+          />
         </div>
       </div>
     </div>

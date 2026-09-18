@@ -4,11 +4,11 @@ export default function Background() {
   const orbs = useMemo(
     () =>
       [
-        { left: '72%', top: '-12%', size: 520, color: 'rgba(99,102,241,0.28)' },
-        { left: '8%', top: '68%', size: 440, color: 'rgba(168,85,247,0.22)' },
-        { left: '38%', top: '28%', size: 600, color: 'rgba(34,211,238,0.14)' },
-        { left: '80%', top: '74%', size: 360, color: 'rgba(244,114,182,0.16)' },
-        { left: '-4%', top: '-8%', size: 480, color: 'rgba(99,102,241,0.18)' },
+        { left: '70%', top: '-14%', size: 520, color: 'rgba(163, 150, 255, 0.30)' },
+        { left: '4%', top: '66%', size: 440, color: 'rgba(226, 176, 255, 0.28)' },
+        { left: '36%', top: '24%', size: 600, color: 'rgba(132, 220, 255, 0.20)' },
+        { left: '82%', top: '72%', size: 360, color: 'rgba(255, 190, 228, 0.26)' },
+        { left: '-6%', top: '-10%', size: 480, color: 'rgba(180, 170, 255, 0.24)' },
       ],
     []
   )

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 *,
 *::before,
@@ -9,8 +9,9 @@
 }
 
 :root {
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  color-scheme: dark;
+  font-family: 'Outfit', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+  --font-ui: 'Outfit', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 15px;
@@ -23,8 +24,8 @@ body,
 }
 
 body {
-  background: #080a16;
-  color: #e8ecff;
+  background: #eef1f8;
+  color: #232a3b;
   overflow: hidden;
 }
 
