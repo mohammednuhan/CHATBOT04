@@ -1,12 +1,15 @@
 import json
-from fastapi import FastAPI
+import os
+import uuid
+from datetime import datetime
+from typing import Literal, Optional
+
+from fastapi import BackgroundTasks, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from openai import OpenAI
-import os
 from dotenv import load_dotenv
-import uuid
 
 load_dotenv()
 
@@ -25,9 +28,24 @@ SYSTEM_PROMPT = {
     "role": "system",
     "content": (
         "You are Agent, a helpful, friendly, and concise AI assistant. "
-        "Answer the user's questions clearly and directly."
+        "You have a long-term memory of facts about the user. Use that "
+        "memory to personalize your answers and sound natural. If you "
+        "don't know something, say so."
     ),
 }
+
+MEMORY_EXTRACTION_PROMPT = (
+    "Review the conversation and extract the important facts the user has "
+    "shared about themselves: their name, identity, preferences, opinions, "
+    "goals, projects, job, or anything useful to remember for future answers. "
+    "Keep each fact a short, standalone sentence. "
+    "Return ONLY a JSON array, no markdown, in this exact format:\n"
+    '[{"text": "fact sentence", "category": "preference|fact|goal|project|identity"}]\n'
+    "Include the existing memories that are still true (merge duplicates), "
+    "plus any new facts. If nothing important, return []."
+)
+
+CATEGORIES = ("preference", "fact", "goal", "project", "identity")
 
 app = FastAPI(title="Agent Chat API")
 
@@ -39,13 +57,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-sessions = {}
+conversations = {}
+memories = {}
 
 
 class ChatRequest(BaseModel):
-    session_id: str | None = None
+    session_id: Optional[str] = None
     message: str
-    model: str | None = None
+    model: Optional[str] = None
 
 
 class ChatResponse(BaseModel):
@@ -53,42 +72,128 @@ class ChatResponse(BaseModel):
     session_id: str
 
 
-def get_session(session_id: str | None) -> list:
+class MemoryRequest(BaseModel):
+    session_id: str
+    text: str
+    category: Literal["preference", "fact", "goal", "project", "identity"] = "fact"
+
+
+class MemoryDeleteRequest(BaseModel):
+    session_id: str
+    id: str
+
+
+class ResetRequest(BaseModel):
+    session_id: Optional[str] = None
+
+
+def get_session(session_id: Optional[str]) -> str:
     if not session_id:
         session_id = str(uuid.uuid4())
-    if session_id not in sessions:
-        sessions[session_id] = [dict(SYSTEM_PROMPT)]
-    return session_id, sessions[session_id]
+    conversations.setdefault(session_id, [])
+    memories.setdefault(session_id, [])
+    return session_id
+
+
+def build_messages(session_id: str) -> list:
+    msgs = [dict(SYSTEM_PROMPT)]
+    mems = memories.get(session_id, [])
+    if mems:
+        lines = [f"- {m['text']}" for m in mems]
+        msgs.append(
+            {
+                "role": "system",
+                "content": "Facts I remember about the user:\n" + "\n".join(lines),
+            }
+        )
+    msgs.extend(conversations.get(session_id, []))
+    return msgs
+
+
+def extract_memories(session_id: str) -> None:
+    mems = memories.get(session_id, [])
+    convo = conversations.get(session_id, [])
+    if not convo:
+        return
+
+    recent = convo[-20:]
+    existing = [m["text"] for m in mems]
+
+    prompt = (
+        MEMORY_EXTRACTION_PROMPT
+        + "\n\nExisting memories:\n"
+        + json.dumps(existing)
+        + "\n\nConversation:\n"
+        + "\n".join(f"{m['role']}: {m['content']}" for m in recent)
+    )
+
+    try:
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": "You extract structured memory facts."},
+                {"role": "user", "content": prompt},
+            ],
+        )
+        text = response.choices[0].message.content or ""
+        start, end = text.find("["), text.rfind("]")
+        if start == -1 or end <= start:
+            return
+
+        items = json.loads(text[start : end + 1])
+        updated = []
+        for it in items:
+            if isinstance(it, dict):
+                txt = str(it.get("text", "")).strip()
+                cat = str(it.get("category", "fact")).strip()
+            else:
+                txt = str(it).strip()
+                cat = "fact"
+            if txt:
+                if cat not in CATEGORIES:
+                    cat = "fact"
+                updated.append(
+                    {
+                        "id": str(uuid.uuid4()),
+                        "text": txt,
+                        "category": cat,
+                        "time": datetime.now().isoformat(timespec="seconds"),
+                    }
+                )
+        if updated:
+            memories[session_id] = updated[:30]
+    except Exception:
+        pass
 
 
 @app.post("/chat")
-def chat(req: ChatRequest):
-    session_id, history = get_session(req.session_id)
-
-    history.append({"role": "user", "content": req.message})
+def chat(req: ChatRequest, background_tasks: BackgroundTasks):
+    session_id = get_session(req.session_id)
+    conversations[session_id].append({"role": "user", "content": req.message})
 
     response = client.chat.completions.create(
         model=req.model or MODEL,
-        messages=history,
+        messages=build_messages(session_id),
     )
 
     answer = response.choices[0].message.content
-    history.append({"role": "assistant", "content": answer})
+    conversations[session_id].append({"role": "assistant", "content": answer})
+    background_tasks.add_task(extract_memories, session_id)
 
     return ChatResponse(reply=answer, session_id=session_id)
 
 
 @app.post("/chat/stream")
-async def chat_stream(req: ChatRequest):
-    session_id, history = get_session(req.session_id)
-    history.append({"role": "user", "content": req.message})
+async def chat_stream(req: ChatRequest, background_tasks: BackgroundTasks):
+    session_id = get_session(req.session_id)
+    conversations[session_id].append({"role": "user", "content": req.message})
 
     def event_stream():
         full = ""
         try:
             stream = client.chat.completions.create(
                 model=req.model or MODEL,
-                messages=list(history),
+                messages=build_messages(session_id),
                 stream=True,
             )
             for chunk in stream:
@@ -104,8 +209,10 @@ async def chat_stream(req: ChatRequest):
             yield f"data: {json.dumps({'error': str(exc)})}\n\n"
             return
 
-        history.append({"role": "assistant", "content": full})
+        conversations[session_id].append({"role": "assistant", "content": full})
         yield f"data: {json.dumps({'done': True, 'session_id': session_id})}\n\n"
+
+    background_tasks.add_task(extract_memories, session_id)
 
     return StreamingResponse(
         event_stream(),
@@ -114,11 +221,47 @@ async def chat_stream(req: ChatRequest):
     )
 
 
+@app.get("/memories")
+def get_memories(session_id: str):
+    return {"memories": memories.get(session_id, [])}
+
+
+@app.post("/memories")
+def add_memory(req: MemoryRequest):
+    session_id = get_session(req.session_id)
+    memories[session_id].append(
+        {
+            "id": str(uuid.uuid4()),
+            "text": req.text.strip(),
+            "category": req.category,
+            "time": datetime.now().isoformat(timespec="seconds"),
+        }
+    )
+    return {"memories": memories[session_id]}
+
+
+@app.post("/memories/delete")
+def delete_memory(req: MemoryDeleteRequest):
+    session_id = get_session(req.session_id)
+    memories[session_id] = [
+        m for m in memories.get(session_id, []) if m["id"] != req.id
+    ]
+    return {"memories": memories.get(session_id, [])}
+
+
+@app.post("/memories/clear")
+def clear_memories(req: ResetRequest):
+    session_id = get_session(req.session_id)
+    memories[session_id] = []
+    return {"memories": []}
+
+
 @app.post("/reset")
-def reset(req: dict):
-    session_id = req.get("session_id")
-    if session_id and session_id in sessions:
-        del sessions[session_id]
+def reset(req: ResetRequest):
+    session_id = req.session_id
+    if session_id:
+        conversations.pop(session_id, None)
+        memories.pop(session_id, None)
     return {"ok": True}
 
 
