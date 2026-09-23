@@ -1,2 +1,14 @@
 INFO:     127.0.0.1:59985 - "GET /health HTTP/1.1" 200 OK
 INFO:     127.0.0.1:59986 - "GET /memories?session_id=test123 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54381 - "POST /chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54385 - "POST /chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62347 - "POST /chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61824 - "GET /memories?session_id=: HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61826 - "POST /chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53101 - "GET /memories?session_id=12750dce-645e-4348-a608-d4294e62f3f0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64500 - "POST /chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50061 - "GET /memories?session_id=a30e8e4a-2f3e-468c-827d-f417198aaeb1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62908 - "GET /memories?session_id=a30e8e4a-2f3e-468c-827d-f417198aaeb1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52782 - "POST /chat/stream HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63373 - "GET /memories?session_id=a30e8e4a-2f3e-468c-827d-f417198aaeb1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55648 - "GET /memories?session_id=a30e8e4a-2f3e-468c-827d-f417198aaeb1 HTTP/1.1" 200 OK
