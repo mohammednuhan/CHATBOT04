@@ -1,6 +1,4 @@
-# ============================================================
-# Stage 1 — build the React frontend with Node
-# ============================================================
+
 FROM node:22-alpine AS client
 WORKDIR /build
 COPY client/package.json client/package-lock.json ./
@@ -8,9 +6,6 @@ RUN npm ci
 COPY client/ .
 RUN npm run build
 
-# ============================================================
-# Stage 2 — Python runtime serving API + static frontend
-# ============================================================
 FROM python:3.12-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
