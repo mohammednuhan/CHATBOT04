@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+*.pyc
+.env
+*.log
+backend.log
+backend.err.log
+client/node_modules
+client/dist
+client/vite.log
+client/client.log

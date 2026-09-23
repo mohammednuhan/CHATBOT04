@@ -7,6 +7,7 @@ from typing import Literal, Optional
 from fastapi import BackgroundTasks, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -268,3 +269,24 @@ def reset(req: ResetRequest):
 @app.get("/health")
 def health():
     return {"status": "ok", "model": MODEL}
+
+
+# ---------- Production: serve the built frontend + accept the /api prefix ----------
+# The built React client calls /api/<path>; in production (no dev proxy) we
+# strip that prefix before routing, so /api/chat/stream -> /chat/stream.
+# During local dev the Vite proxy already rewrites /api away, so this is a no-op.
+
+
+@app.middleware("http")
+async def api_prefix_middleware(request, call_next):
+    path = request.scope.get("path", "")
+    if path == "/api":
+        request.scope["path"] = "/"
+    elif path.startswith("/api/"):
+        request.scope["path"] = path[4:]
+    return await call_next(request)
+
+
+FRONTEND_DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "client", "dist")
+if os.path.isdir(FRONTEND_DIST):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")
