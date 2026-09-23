@@ -1,20 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
+:root {
+  font-family: 'Outfit', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+  --font-ui: 'Outfit', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --bg-base: #07070b;
+  --bg-panel: #12121a;
+  --bg-elev: #1a1a26;
+  --bg-elev-2: #21212e;
+  --text-primary: #eef0f7;
+  --text-muted: #8f93a8;
+  --text-faint: #5b6073;
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.13);
+  --accent: #7c76ff;
+  --accent-2: #a855f7;
+  --accent-glow: rgba(124, 118, 255, 0.55);
+  --danger: #fb7185;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 15px;
+}
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-:root {
-  font-family: 'Outfit', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  color-scheme: light;
-  --font-ui: 'Outfit', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: 15px;
 }
 
 html,
@@ -24,8 +37,8 @@ body,
 }
 
 body {
-  background: #eef1f8;
-  color: #232a3b;
+  background: var(--bg-base);
+  color: var(--text-primary);
   overflow: hidden;
 }
 
