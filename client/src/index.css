@@ -1,27 +1,160 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
+/* ============================================================
+   Agent — design tokens
+   Every colour, radius, shadow and duration in the app comes
+   from this file. App.css must not hardcode raw values.
+   ============================================================ */
 :root {
-  font-family: 'Outfit', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  color-scheme: dark;
+  /* ---------- Typography ---------- */
   --font-ui: 'Outfit', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --bg-base: #07070b;
-  --bg-panel: #12121a;
+
+  --fs-2xs: 10.5px; /* timestamps, meta, day divider */
+  --fs-xs: 11.5px; /* section labels, sub-labels */
+  --fs-sm: 12.5px; /* chips, card titles, previews */
+  --fs-md: 13.5px; /* list rows, sidebar titles */
+  --fs-base: 14px; /* message body, composer */
+  --fs-lg: 15px; /* chat header name */
+  --fs-xl: 16px; /* panel titles */
+  --fs-2xl: 17px; /* brand name */
+  --fs-display: 26px; /* welcome headline */
+
+  --lh-tight: 1.35;
+  --lh-body: 1.58;
+  --lh-relaxed: 1.62;
+  --tracking-wide: 0.8px;
+  --tracking-mid: 0.4px;
+
+  /* ---------- Surfaces ---------- */
+  --bg-base: #06060a;
   --bg-elev: #1a1a26;
-  --bg-elev-2: #21212e;
+
+  --surface-window: rgba(17, 17, 25, 0.72);
+  --surface-chrome: rgba(24, 24, 34, 0.82); /* title bar */
+  --surface-panel: rgba(20, 20, 29, 0.82); /* sidebar, memory panel */
+  --surface-header: rgba(20, 20, 29, 0.55); /* chat header */
+  --surface-canvas: rgba(11, 11, 17, 0.42); /* message column */
+  --surface-solid: #1c1c29; /* agent bubble */
+  --surface-raised: #191926; /* composer, cards, inputs */
+  --surface-2: rgba(28, 28, 41, 0.7); /* chips */
+  --surface-inset: #14141d; /* recessed wells */
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  --surface-hover-2: rgba(255, 255, 255, 0.1);
+
+  /* ---------- Text ---------- */
+  --text-strong: #f4f5fb;
   --text-primary: #eef0f7;
-  --text-muted: #8f93a8;
+  --text-body: #e8eaf4;
+  --text-muted: #9498ad;
+  --text-dim: #7c8095;
   --text-faint: #5b6073;
-  --border-soft: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.13);
+  --text-on-accent: #ffffff;
+
+  /* ---------- Accent ---------- */
   --accent: #7c76ff;
   --accent-2: #a855f7;
   --accent-glow: rgba(124, 118, 255, 0.55);
+  --accent-text: #a5a2ff; /* accent-coloured copy on dark */
+  --accent-text-soft: #c4b5fd;
+  --accent-tint: rgba(124, 118, 255, 0.12);
+  --accent-line: rgba(124, 118, 255, 0.32);
+  --accent-line-strong: rgba(124, 118, 255, 0.5);
+  --accent-ring: 0 0 0 4px rgba(124, 118, 255, 0.16);
+  --sky: #38bdf8;
+
+  /* ---------- Semantic ---------- */
   --danger: #fb7185;
+  --danger-solid: #f43f5e;
+  --danger-strong: #fb4764;
+  --danger-tint: rgba(244, 63, 94, 0.1);
+  --danger-tint-2: rgba(244, 63, 94, 0.16);
+  --success: #22c55e;
+  --success-glow: rgba(34, 197, 94, 0.6);
+
+  /* ---------- Borders ---------- */
+  --border-soft: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.13);
+  --border-input: rgba(255, 255, 255, 0.11);
+
+  /* ---------- Gradients ---------- */
+  --grad-accent: linear-gradient(135deg, #7c76ff, #a855f7);
+  --grad-accent-soft: linear-gradient(135deg, #7c76ff, #8b5cf6);
+  --grad-headline: linear-gradient(92deg, #f4f5fb, #b9b6ff);
+  --grad-profile: linear-gradient(135deg, #f472b6, #a855f7);
+  --grad-ring: conic-gradient(from 0deg, var(--accent), var(--accent-2), var(--sky), var(--accent));
+  --grad-composer-fade: linear-gradient(
+    to top,
+    rgba(13, 13, 20, 0.94) 42%,
+    rgba(13, 13, 20, 0.66) 74%,
+    rgba(13, 13, 20, 0) 100%
+  );
+  --grad-chrome-light: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 72%);
+
+  /* ---------- Radii ---------- */
+  --r-xs: 6px;
+  --r-sm: 9px;
+  --r-md: 11px;
+  --r-lg: 13px;
+  --r-xl: 16px;
+  --r-2xl: 18px;
+  --r-pill: 999px;
+
+  /* ---------- Elevation ---------- */
+  --shadow-xs: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.32);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.45);
+  --shadow-panel: -20px 0 60px rgba(0, 0, 0, 0.55);
+  --shadow-accent: 0 6px 20px rgba(124, 118, 255, 0.35);
+  --shadow-accent-lg: 0 10px 28px rgba(168, 85, 247, 0.42);
+  --shadow-accent-sm: 0 3px 10px rgba(124, 118, 255, 0.35);
+  --shadow-accent-md: 0 4px 14px rgba(124, 118, 255, 0.4);
+  --shadow-accent-soft: 0 8px 22px rgba(124, 118, 255, 0.28);
+  --shadow-danger: 0 4px 14px rgba(244, 63, 94, 0.35);
+  --glow-accent: 0 0 50px rgba(124, 118, 255, 0.3);
+  --shadow-window: 0 40px 120px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.4);
+  --shadow-top-inset: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --shadow-bubble-top: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-window: 0 40px 120px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.4);
+
+  /* ---------- Spacing ---------- */
+  --sp-1: 4px;
+  --sp-2: 6px;
+  --sp-3: 8px;
+  --sp-4: 10px;
+  --sp-5: 12px;
+  --sp-6: 14px;
+  --sp-7: 16px;
+  --sp-8: 20px;
+  --sp-9: 24px;
+  --sp-10: 32px;
+
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-instant: 0.12s;
+  --t-fast: 0.18s;
+  --t-base: 0.22s;
+  --t-slow: 0.32s;
+
+  /* ---------- Scrollbars ---------- */
+  --scroll-size: 8px;
+  --scroll-thumb: rgba(255, 255, 255, 0.14);
+  --scroll-thumb-hi: rgba(255, 255, 255, 0.24);
+
+  /* ---------- Global ---------- */
+  font-family: var(--font-ui);
+  color-scheme: dark;
+  font-size: 15px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 15px;
+  text-rendering: optimizeLegibility;
 }
 
+/* ============================================================
+   Reset
+   ============================================================ */
 *,
 *::before,
 *::after {
@@ -44,9 +177,80 @@ body {
 
 button {
   font-family: inherit;
+  color: inherit;
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 input {
   font-family: inherit;
+  color: inherit;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+h1,
+h2,
+h3,
+p {
+  font-weight: inherit;
+  font-size: inherit;
+}
+
+/* ============================================================
+   Global interaction primitives
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+
+::selection {
+  background: rgba(124, 118, 255, 0.34);
+  color: var(--text-on-accent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: var(--scroll-size);
+  height: var(--scroll-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border: 2px solid transparent;
+  border-radius: var(--r-pill);
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-hi);
+  background-clip: content-box;
+}
+
+/* ============================================================
+   Reduced motion — keep the UI usable, drop the movement
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
